@@ -1,12 +1,14 @@
 from django.contrib import admin
 from django.urls import path
+from rest_framework.routers import SimpleRouter
 from .import views
 
+router = SimpleRouter()
+#Register viewset and   Router generate url pattern for viewset
+#register takes two parameters(prefix and viewset name)
+router.register('products',views.ProductViewSet)
+router.register('collections',views.CollectionViewSet)
 
 
-urlpatterns = [
-    path('products/',views.product_list),
-    path('products/<int:id>/',views.product_detail),
-    path('collections/',views.collection_list),
-    path('collections/<int:id>/',views.collection_detail)
-]
+
+urlpatterns = router.urls

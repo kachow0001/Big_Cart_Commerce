@@ -1,11 +1,10 @@
 from decimal import Decimal
 from rest_framework import serializers
-from .models import Product,Collection
+from .models import Product,Collection,Reviews
 
 #create Collection serializers 
 class CollectionSerializer(serializers.ModelSerializer):
     products_count = serializers.SerializerMethodField() 
-
     class Meta:
         
         model = Collection
@@ -29,4 +28,8 @@ class ProductSerializer(serializers.ModelSerializer):
     def calculate_tax(self, product: Product):
         return product.unit_price * Decimal(2.0)
         
-        
+class ReviewSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Reviews       
+        fields = ['id','name','description','date']
