@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from  uuid import uuid4
 
 class Collection(models.Model):
     title = models.CharField(max_length=255)  # Fixed the field name from 'tittle' to 'title'
@@ -12,7 +13,7 @@ class Collection(models.Model):
     def __str__(self) -> str:
         return self.title  
     
-      
+#Inorder to eliminate icontains error associated with product model
 class Product(models.Model):
     title = models.CharField(max_length=255)
     slug = models.SlugField()
@@ -21,11 +22,12 @@ class Product(models.Model):
         max_digits=5, 
         decimal_places=2,
         validators= [MinValueValidator(1)]
-    )  # Fixed the typo 'DecimaltField' to 'DecimalField'
+    ) 
     inventory = models.IntegerField()
     last_update = models.DateTimeField(auto_now=True)
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT,related_name='products')
     
+      
     def __str__(self) -> str:
         return self.title
     
@@ -87,13 +89,20 @@ class OrderItem(models.Model):
     quantity = models.IntegerField()
     unit_price = models.DecimalField(max_digits=5, decimal_places=2)
 
-class Cart(models.Model):  # Added a missing colon (:) at the end
+class Cart(models.Model):  
+    new_id = models.UUIDField(primary_key=True,default=uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE,related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
+    
+
+#creat Meta class to add quantity in cart instead of duplicating product   
+    class Meta:
+        unique_together = [['cart','product']]
 
 class Reviews(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,related_name = 'reviews')

@@ -1,12 +1,11 @@
 from decimal import Decimal
 from rest_framework import serializers
-from .models import Product,Collection,Reviews
+from .models import Product,Collection,Reviews,Cart
 
 #create Collection serializers 
 class CollectionSerializer(serializers.ModelSerializer):
     products_count = serializers.SerializerMethodField() 
     class Meta:
-        
         model = Collection
         fields = ['id','title','products_count']
         
@@ -33,3 +32,24 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Reviews       
         fields = ['id','name','description','date']
+        
+    #override create logic implemantation with fields specified and pass contextproductID from viewSet  
+    def create(self,validated_data):
+        #read product ID from url using context dict
+        product_id = self.context['product_id']
+        #Create product object and return it from here
+        return Reviews.objects.create(product_id =product_id, **validated_data)
+        
+ #Cart Serializer
+ 
+class CartSerializer(serializers.ModelSerializer):
+    new_id= serializers.UUIDField(read_only=True)
+    
+    class Meta:
+        model = Cart
+        fields =['new_id','items']
+        
+    
+    
+        
+             
